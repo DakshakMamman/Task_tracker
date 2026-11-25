@@ -5,9 +5,42 @@ const taskInput = document.querySelector("#task-input");
 const taskList = document.querySelector("#task-list");
 const taskCountNumber = document.querySelector("#task-count-number");
 const filterButtons = document.querySelectorAll(".filter-button");
+const themeToggle = document.querySelector("#theme-toggle");
+const themeIcon = themeToggle.querySelector(".theme-icon");
 
 let tasks = loadTasks();
 let currentFilter = "all";
+
+const THEME_KEY = "taskTrackerTheme";
+
+function getPreferredTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+
+    if (savedTheme === "light" || savedTheme === "dark") {
+        return savedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(theme) {
+    const isDark = theme === "dark";
+
+    document.documentElement.dataset.theme = theme;
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+    themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+    themeIcon.textContent = isDark ? "☀" : "☾";
+}
+
+applyTheme(getPreferredTheme());
+
+themeToggle.addEventListener("click", () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+
+    applyTheme(nextTheme);
+    localStorage.setItem(THEME_KEY, nextTheme);
+});
 
 function loadTasks() {
     try {
